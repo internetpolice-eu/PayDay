@@ -1,0 +1,10 @@
+name: PayDay
+version: 1.6.1
+main: de.brightstorm.payday
+softdepend: [Vault, Essentials]
+dev-url: http://dev.bukkit.org/server-mods/payday/
+commands:
+   payday:
+      permission: payday.admincommand
+   paycheck:
+      description: Check time.
