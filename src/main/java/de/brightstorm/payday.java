@@ -112,13 +112,6 @@ public class payday extends JavaPlugin
             final itemRewarder rewarder2 = new itemRewarder();
             Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask((Plugin)this, (Runnable)rewarder2, 1200L, 1200L);
         }
-        try {
-            final stats st = new stats(this);
-            st.start();
-        }
-        catch (IOException e4) {
-            e4.printStackTrace();
-        }
         payday.log.info(String.valueOf(this.toString()) + " enabled!");
     }
     
