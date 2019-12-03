@@ -1,6 +1,5 @@
 package de.brightstorm;
 
-import java.util.Iterator;
 import org.bukkit.entity.Player;
 
 public class PDPlayer

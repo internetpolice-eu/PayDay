@@ -34,29 +34,29 @@ public class payday extends JavaPlugin
     }
     
     public void onEnable() {
-        payday.dies = (Plugin)this;
+        payday.dies = this;
         payday.log = this.getLogger();
         if (!this.getConfig().contains("groups")) {
             this.getConfig().options().header("Generated " + new Timestamp(new Date().getTime()) + "\nFor help consult http://dev.bukkit.org/server-mods/payday/");
             final List<String> grouplist = new ArrayList<String>();
             grouplist.add("vip");
             grouplist.add("normal");
-            this.getConfig().addDefault("groups", (Object)grouplist);
-            this.getConfig().addDefault("normal.time", (Object)60);
-            this.getConfig().addDefault("normal.amount", (Object)20);
-            this.getConfig().addDefault("normal.interest", (Object)0.5);
-            this.getConfig().addDefault("vip.time", (Object)60);
-            this.getConfig().addDefault("vip.amount", (Object)50);
-            this.getConfig().addDefault("vip.interest", (Object)2);
-            final List<String> worldlist = new ArrayList<String>();
-            this.getConfig().addDefault("restricted_worlds", (Object)worldlist);
+            this.getConfig().addDefault("groups", grouplist);
+            this.getConfig().addDefault("normal.time", 60);
+            this.getConfig().addDefault("normal.amount", 20);
+            this.getConfig().addDefault("normal.interest", 0.5);
+            this.getConfig().addDefault("vip.time", 60);
+            this.getConfig().addDefault("vip.amount", 50);
+            this.getConfig().addDefault("vip.interest", 2);
+            final List<String> worldlist = new ArrayList<>();
+            this.getConfig().addDefault("restricted_worlds", worldlist);
         }
-        this.getConfig().addDefault("message", (Object)"You just got %a for being online %t minutes.");
-        this.getConfig().addDefault("paycheck-message", (Object)"Your next payday is in %t minutes.");
-        this.getConfig().addDefault("use_vault", (Object)true);
-        this.getConfig().addDefault("reward_item", (Object)264);
-        this.getConfig().addDefault("use_essentials", (Object)false);
-        this.getConfig().set("version", (Object)this.getDescription().getVersion());
+        this.getConfig().addDefault("message", "You just got %a for being online %t minutes.");
+        this.getConfig().addDefault("paycheck-message", "Your next payday is in %t minutes.");
+        this.getConfig().addDefault("use_vault", true);
+        this.getConfig().addDefault("reward_item", 264);
+        this.getConfig().addDefault("use_essentials", false);
+        this.getConfig().set("version", this.getDescription().getVersion());
         this.getConfig().options().copyDefaults(true);
         this.saveConfig();
         g.useEssentials = this.getConfig().getBoolean("use_essentials");
@@ -72,10 +72,10 @@ public class payday extends JavaPlugin
         payday.groups = (List<String>)this.getConfig().getList("groups");
         final File userFile = new File(this.getDataFolder() + System.getProperty("file.separator") + "users.yml");
         payday.money = this.getConfig().getBoolean("use_vault");
-        payday.worlds = (List<String>)this.getConfig().getStringList("restricted_worlds");
+        payday.worlds = this.getConfig().getStringList("restricted_worlds");
         if (payday.money && !this.getServer().getPluginManager().isPluginEnabled("Vault")) {
             payday.log.warning("Vault seems to be not installed. Gonna disable myself...");
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask((Plugin)this, (Runnable)new Runnable() {
+            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                 @Override
                 public void run() {
                     payday.this.getServer().getPluginManager().disablePlugin(payday.dies);
@@ -83,7 +83,7 @@ public class payday extends JavaPlugin
             }, 60L);
             payday.money = false;
         }
-        payday.users = (FileConfiguration)new YamlConfiguration();
+        payday.users = new YamlConfiguration();
         if (!userFile.exists()) {
             try {
                 userFile.createNewFile();
@@ -106,13 +106,13 @@ public class payday extends JavaPlugin
         }
         if (payday.money) {
             final moneyRewarder rewarder = new moneyRewarder();
-            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask((Plugin)this, (Runnable)rewarder, 1200L, 1200L);
+            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, rewarder, 1200L, 1200L);
         }
         else {
             final itemRewarder rewarder2 = new itemRewarder();
-            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask((Plugin)this, (Runnable)rewarder2, 1200L, 1200L);
+            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, rewarder2, 1200L, 1200L);
         }
-        payday.log.info(String.valueOf(this.toString()) + " enabled!");
+        payday.log.info(this.toString() + " enabled!");
     }
     
     public boolean onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
@@ -133,7 +133,7 @@ public class payday extends JavaPlugin
                     this.reloadConfig();
                     payday.groups = (List<String>)this.getConfig().getList("groups");
                     payday.money = this.getConfig().getBoolean("use_vault");
-                    payday.worlds = (List<String>)this.getConfig().getStringList("restricted_worlds");
+                    payday.worlds = this.getConfig().getStringList("restricted_worlds");
                     sender.sendMessage(ChatColor.DARK_GREEN + "config.yml reloaded!");
                 }
                 else {
@@ -177,7 +177,7 @@ public class payday extends JavaPlugin
             }
             else {
                 final String raw = payday.dies.getConfig().getString("paycheck-message");
-                final String message = StringUtils.replace(raw, "%t", String.valueOf(payday.dies.getConfig().getInt(String.valueOf(p.getGroup()) + ".time") - payday.users.getInt(p.getPlayer().getName())));
+                final String message = StringUtils.replace(raw, "%t", String.valueOf(payday.dies.getConfig().getInt(p.getGroup() + ".time") - payday.users.getInt(p.getPlayer().getName())));
                 sender.sendMessage(ChatColor.BLUE + message);
             }
             return true;
@@ -186,7 +186,7 @@ public class payday extends JavaPlugin
     }
     
     public void onDisable() {
-        Bukkit.getScheduler().cancelTasks((Plugin)this);
+        Bukkit.getScheduler().cancelTasks(this);
         final File userFile = new File(this.getDataFolder() + System.getProperty("file.separator") + "users.yml");
         try {
             payday.users.save(userFile);
@@ -194,6 +194,6 @@ public class payday extends JavaPlugin
         catch (IOException e) {
             e.printStackTrace();
         }
-        payday.log.info(String.valueOf(this.toString()) + " disabled!");
+        payday.log.info(this.toString() + " disabled!");
     }
 }
